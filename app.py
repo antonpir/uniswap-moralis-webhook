@@ -4,7 +4,7 @@ import json
 
 # ✅ Connect to Alchemy WebSocket
 ALCHEMY_WEBSOCKET = "wss://arb-mainnet.g.alchemy.com/v2/ubXirrpIlws_G3ujTpCgFE5uIHv0hQFh"
-web3 = Web3(Web3.WebsocketProvider(ALCHEMY_WEBSOCKET))
+web3 = Web3(Web3.LegacyWebSocketProvider(ALCHEMY_WEBSOCKET))
 
 getcontext().prec = 40  # High precision calculations
 
