@@ -2,6 +2,17 @@ from web3 import Web3
 from decimal import Decimal, getcontext
 import json
 
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Webhook is live!"
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+
 # ✅ Connect to Alchemy WebSocket
 ALCHEMY_WEBSOCKET = "wss://arb-mainnet.g.alchemy.com/v2/ubXirrpIlws_G3ujTpCgFE5uIHv0hQFh"
 web3 = Web3(Web3.LegacyWebSocketProvider(ALCHEMY_WEBSOCKET))
