@@ -1,17 +1,18 @@
 from web3 import Web3
 from decimal import Decimal, getcontext
 import json
-
-from flask import Flask
+from flask import Flask, request, jsonify  # ✅ Import missing dependencies
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return "Webhook is live!"
+@app.route('/moralis-webhook', methods=['POST'])
+def moralis_webhook():
+    data = request.json
+    print("✅ Received webhook:", json.dumps(data, indent=2))  # Pretty print JSON
+    return jsonify({"status": "success"}), 200
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)  # ✅ Enable debug mode
 
 # ✅ Connect to Alchemy WebSocket
 ALCHEMY_WEBSOCKET = "wss://arb-mainnet.g.alchemy.com/v2/ubXirrpIlws_G3ujTpCgFE5uIHv0hQFh"
