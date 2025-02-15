@@ -8,9 +8,10 @@ app = Flask(__name__)
 
 # Function to calculate ARB price in USD
 def calculate_arb_price(sqrt_price_x96):
-    price = (Decimal(sqrt_price_x96) / (2 ** 96)) ** 2
-    adjusted_price = price * Decimal(10 ** 12)  # Adjust for ARB (18) → USDC (6)
-    return float(adjusted_price)  # Convert Decimal to float
+    sqrt_price_decimal = Decimal(sqrt_price_x96) / (2 ** 96)  # Convert sqrtPriceX96 to Decimal
+    price = sqrt_price_decimal ** 2  # Square the price
+    adjusted_price = price * Decimal(10 ** 12)  # Adjust for ARB (18) → USDC (6) decimals
+    return float(adjusted_price)  # Convert Decimal to float for output
 
 @app.route("/moralis-webhook", methods=["POST"])
 def moralis_webhook():
