@@ -8,9 +8,15 @@ getcontext().prec = 40  # High precision
 
 def calculate_arb_price(sqrt_price_x96):
     try:
+        # Convert sqrtPriceX96 to a decimal value
         sqrt_price_decimal = Decimal(sqrt_price_x96) / (2 ** 96)
+
+        # Square it to get the price of ARB in USDC
         price = sqrt_price_decimal ** 2
-        adjusted_price = price * Decimal(10 ** 12)  # Adjust for ARB decimals (18 → 6)
+
+        # Adjust for ARB (18 decimals) to USDC (6 decimals)
+        adjusted_price = price * Decimal(10 ** -12)
+
         return float(adjusted_price)
     except Exception as e:
         print(f"Error in price calculation: {e}")
