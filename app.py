@@ -2,25 +2,42 @@ import os
 from decimal import Decimal, getcontext
 from flask import Flask, request, jsonify
 
-getcontext().prec = 40  # Set high precision to avoid overflow
-
 app = Flask(__name__)
 
-# Function to calculate ARB price in USD
+getcontext().prec = 40  # High precision
+
 def calculate_arb_price(sqrt_price_x96):
-    sqrt_price_decimal = Decimal(sqrt_price_x96) / (2 ** 96)  # Convert sqrtPriceX96 to Decimal
-    price = sqrt_price_decimal ** 2  # Square the price
-    adjusted_price = price * Decimal(10 ** 12)  # Adjust for ARB (18) → USDC (6) decimals
-    return float(adjusted_price)  # Convert Decimal to float for output
+    try:
+        sqrt_price_decimal = Decimal(sqrt_price_x96) / (2 ** 96)
+        price = sqrt_price_decimal ** 2
+        adjusted_price = price * Decimal(10 ** 12)
+        return float(adjusted_price)
+    except Exception as e:
+        print(f"Error in price calculation: {e}")
+        return None
 
 @app.route("/moralis-webhook", methods=["POST"])
 def moralis_webhook():
-    data = request.json
-    if "logs" in data:
-        for log in data["logs"]:
-            sqrt_price_x96 = int(log["data"][:66], 16)  # Extract sqrtPriceX96 from data field
-            arb_price_usd = calculate_arb_price(sqrt_price_x96)
-            print(f"ARB Price in USD: ${arb_price_usd}")
+    try:
+        data = request.json  # Get Moralis webhook payload
+        print("Received webhook data:", data)  # Debugging
+
+        if "logs" in data:
+            for log in data["logs"]:
+                print("Log data:", log)  # Debug each log entry
+
+                # Extract sqrtPriceX96 from log["data"]
+                raw_data = log["data"]
+                sqrt_price_x96 = int(raw_data[:66], 16)  # First 66 chars = sqrtPriceX96
+
+                print(f"Extracted sqrtPriceX96: {sqrt_price_x96}")
+
+                arb_price_usd = calculate_arb_price(sqrt_price_x96)
+                print(f"Corrected ARB Price in USD: ${arb_price_usd}")
+
+    except Exception as e:
+        print(f"Error processing webhook: {e}")
+
     return jsonify({"status": "success"})
 
 if __name__ == "__main__":
